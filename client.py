@@ -13,7 +13,7 @@ def Send():
         channel.basic_publish(exchange='',
                             routing_key='hello',
                             body=message)
-        print(" [x] Sent %r" % message)
+        print("Sent: %r to Group" % message)
     connection.close()
 
 def Receive():
@@ -29,10 +29,10 @@ def Receive():
     channel.queue_bind(exchange='logs',
                     queue=queue_name)
 
-    print(' [*] Waiting for logs. To exit press CTRL+C')
+    print('Waiting for messages')
 
     def callback(ch, method, properties, body):
-        print(" [x] %r" % body)
+        print("Received: %r from Group" % body)
 
     channel.basic_consume(callback,
                         queue=queue_name,

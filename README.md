@@ -13,6 +13,12 @@ Repositorio para entregable del proyecto 2
 *Para correr el cliente ejemplo:*
 - client.py
 
+### Requerimientos
+- [Python 3](https://www.python.org/downloads/release/python-371/)
+- [Pika lib](https://pika.readthedocs.io/en/latest/index.html)
+- [Erlang/OTP](http://www.erlang.org/downloads)
+- [RabbitMQ](https://www.rabbitmq.com/download.html)
+
 ### Explicaciones
 *Explicación del cliente para usuario:*
 - El cliente debe tener una funcion de Send, que cree la conexión en el canal del servidor por medio de la libreria Pika de RabbitMQ.

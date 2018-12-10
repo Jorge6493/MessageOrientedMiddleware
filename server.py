@@ -15,7 +15,7 @@ def Send(msg):
         channel.basic_publish(exchange='logs',
                             routing_key='',
                             body=message)
-        print(" [c] Sent %r" % message)
+        print("Sent %r" % message)
     connection.close()
 
 def Receive():
@@ -31,7 +31,7 @@ def Receive():
     channel.queue_bind(exchange='logs',
                     queue=queue_name)
 
-    print(' [*] Waiting for logs. To exit press CTRL+C')
+    print('Waiting for messages')
 
     channel.queue_declare(queue='hello')
 
@@ -52,11 +52,11 @@ def Receive():
 
     channel.start_consuming()
 
-send_thread = threading.Thread(target=Send(""))
+# send_thread = threading.Thread(target=Send(""))
 receive_thread = threading.Thread(target=Receive)
 
-send_thread.start()
+# send_thread.start()
 receive_thread.start()
 
-send_thread.join()
+# send_thread.join()
 receive_thread.join()

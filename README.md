@@ -15,7 +15,7 @@ Repositorio para entregable del proyecto 2
 
 ### Requerimientos
 - [Python 3](https://www.python.org/downloads/release/python-371/)
-- [Pika lib](https://pika.readthedocs.io/en/latest/index.html)
+- [Pika](https://pika.readthedocs.io/en/latest/index.html)
 - [Erlang/OTP](http://www.erlang.org/downloads)
 - [RabbitMQ](https://www.rabbitmq.com/download.html)
 

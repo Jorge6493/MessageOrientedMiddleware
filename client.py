@@ -1,52 +1,50 @@
-import socket
+import pika
+import sys
 import threading
-import msvcrt
 
-# Define the message to the server
-# bytesToSend = str.encode(msgFromClient)
-# Buffer size for receiving the datagrams from server
-bufferSize = 1024
-# Server IP address and Port number
-serverAddressPort = ("127.0.0.1", 9999)
-# Connect2Server forms the thread - for each connection made to the serve
-#Create a socket instance - A datagram socket
-UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-def Connect2Server():
-   while True:
+def Send():
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
 
-      msgFromClient = input()
-      #while not msvcrt.kbhit():
-      # msgFromClient = msvcrt.getch()
-      bytesToSend = str.encode(msgFromClient)
-      # bytesToSend = msgFromClient
-      # Send message to server using created UDP socket
-      UDPClientSocket.sendto(bytesToSend, serverAddressPort)
-      
-      # Receive message from the server
-      msgFromServer = UDPClientSocket.recvfrom(bufferSize)
-      msg = "Message from Server {}".format(msgFromServer[0])
-      print(msg)
+    channel.queue_declare(queue='hello')
+    message = ""                        
+    while True:
+        message = input()
+        channel.basic_publish(exchange='',
+                            routing_key='hello',
+                            body=message)
+        print(" [x] Sent %r" % message)
+    connection.close()
 
-def recevefromserver():
-   while True:
-      # Receive message from the server
-      msgFromServer = UDPClientSocket.recv(bufferSize)
-      msg = "Message from Server {}".format(msgFromServer[0])
-      print(msg)
+def Receive():
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
 
-print("Client - Main thread started")  
-# ThreadList  = []
-# ThreadCount = 20
-# Create as many connections as defined by ThreadCount
-# for index in range(ThreadCount):
-# ThreadInstance = threading.Thread(target=Connect2Server())
-# ThreadList.append(ThreadInstance)
+    channel.exchange_declare(exchange='logs',
+                            exchange_type='fanout')
 
-threadReceive = threading.Thread(target=recevefromserver())
-# ThreadList.append(threadReceive)
+    result = channel.queue_declare(exclusive=True)
+    queue_name = result.method.queue
 
-# ThreadInstance.start()
-threadReceive.start()
-# Main thread to wait till all connection threads are complete
-# for index in range(2):
-#     ThreadList[index].join()
+    channel.queue_bind(exchange='logs',
+                    queue=queue_name)
+
+    print(' [*] Waiting for logs. To exit press CTRL+C')
+
+    def callback(ch, method, properties, body):
+        print(" [x] %r" % body)
+
+    channel.basic_consume(callback,
+                        queue=queue_name,
+                        no_ack=True)
+
+    channel.start_consuming()
+    
+send_thread = threading.Thread(target=Send)
+receive_thread = threading.Thread(target=Receive)
+
+send_thread.start()
+receive_thread.start()
+
+send_thread.join()
+receive_thread.join()
